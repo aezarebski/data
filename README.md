@@ -10,3 +10,11 @@ __Cite as:__ Adam Mahdi, Piotr Błaszczyk, Paweł Dłotko, Dario Salvi, Tak-Shin
 <em>Oxford COVID-19 Database: multimodal data repository for understanding the global impact of COVID-19. University of Oxford</em>, 2020.
 
 ---
+
+## Coverage and completeness
+
+Measureing the completeness of an epidemiological database is a complex task.
+The following map demonstrates how many data sources report confirmed cases in
+each country. 
+
+![](.out/coverage-plot-01.png)
