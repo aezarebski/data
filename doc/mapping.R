@@ -6,16 +6,28 @@ library(dplyr)
 library(cowplot)
 library(reshape2)
 
+## Define some parameters for how to draw and colour the figure
+
 my_breaks <- seq(from = 0, to = 20000, by = 5000)
 
-my_cols <- hcl.colors(n = length(my_breaks) - 1, palette = "reds 3", alpha = NULL, rev = TRUE, fixup = TRUE)
+my_cols <- hcl.colors(n = length(my_breaks) - 1,
+                      palette = "reds 3",
+                      alpha = NULL,
+                      rev = TRUE,
+                      fixup = TRUE)
 
-map_country_line_colour <- "#FFFFFF"
+map_country_line_colour <- "#252525"
+map_inline_thickness <- 0.2
+map_outline_thickness <- 0.5
 
-map_plot_background <- element_rect(colour = "#FFFFFF", fill = "#f0f0f0")
+map_plot_background <- element_rect(colour = "#252525",
+                                    fill = "#FFFFFF")
 
 
 italy_sf <- gadm_sf_loadCountries("ITA", level = 1)$sf
+## Include an additional level zero object for the country outline.
+italy_outline_sf <- gadm_sf_loadCountries("ITA", level = 0)$sf
+
 
 epi_df <- read.csv("../data-epidemiology/covid19db-epidemiology-ITA_PC.csv", stringsAsFactors = FALSE) %>%
     filter(adm_area_2 == "") %>%
@@ -28,8 +40,10 @@ epi_df <- rename(epi_df, NAME_1 = adm_area_1)
 
 date_index_1 <- "01-04-2020"
 plot_sf_1 <- left_join(italy_sf, filter(epi_df, date == date_index_1), by = "NAME_1")
+
 g_1 <- ggplot() +
     geom_sf(data = plot_sf_1, mapping = aes(fill = dead), colour = map_country_line_colour) +
+    geom_sf(data = italy_outline_sf, fill = NA, colour = map_country_line_colour, size = map_outline_thickness) +
     scale_fill_gradientn(breaks = my_breaks,
                          colors = my_cols,
                          limits = range(my_breaks)) +
@@ -41,6 +55,7 @@ date_index_2 <- "01-05-2020"
 plot_sf_2 <- left_join(italy_sf, filter(epi_df, date == date_index_2), by = "NAME_1")
 g_2 <- ggplot() +
     geom_sf(data = plot_sf_2, mapping = aes(fill = dead), colour = map_country_line_colour) +
+    geom_sf(data = italy_outline_sf, fill = NA, colour = map_country_line_colour, size = map_outline_thickness) +
     scale_fill_gradientn(breaks = my_breaks,
                       colors = my_cols,
                       limits = range(my_breaks)) +
@@ -53,6 +68,7 @@ plot_sf_3 <- left_join(italy_sf, filter(epi_df, date == date_index_3), by = "NAM
 
 g_3 <- ggplot() +
     geom_sf(data = plot_sf_3, mapping = aes(fill = dead), colour = map_country_line_colour) +
+    geom_sf(data = italy_outline_sf, fill = NA, colour = map_country_line_colour, size = map_outline_thickness) +
     scale_fill_gradientn(breaks = my_breaks,
                       colors = my_cols,
                       limits = range(my_breaks)) +
@@ -60,7 +76,7 @@ g_3 <- ggplot() +
     theme(plot.background = map_plot_background)
 
 italy_legend <- get_legend(g_1 +
-                           labs(fill = "Cumulative deaths") +
+                           labs(fill = "Cumulative\ndeaths") +
                            theme(legend.position = "left",
                                  legend.box.margin = margin(0, 0, 0, 0),
                                  legend.key.height = unit(2, units = "cm")))
@@ -131,4 +147,4 @@ g_final <- plot_grid(g_ts,
                      rel_widths = c(0.7,1.0),
                      labels = c("","D"))
 
-ggsave("out/demo-combination-plot.png", g_final, width = 2 * 14.8, height = 2 * 10.5, units = "cm")
+ggsave("out/demo-combination-plot.pdf", g_final, width = 2 * 14.8, height = 2 * 10.5, units = "cm")
