@@ -17,7 +17,7 @@ my_cols <- hcl.colors(n = length(my_breaks) - 1,
                       fixup = TRUE)
 
 map_country_line_colour <- "#252525"
-map_inline_thickness <- 0.2
+map_inline_thickness <- 0.1
 map_outline_thickness <- 0.5
 
 map_plot_background <- element_rect(colour = "#252525",
@@ -42,7 +42,7 @@ date_index_1 <- "01-04-2020"
 plot_sf_1 <- left_join(italy_sf, filter(epi_df, date == date_index_1), by = "NAME_1")
 
 g_1 <- ggplot() +
-    geom_sf(data = plot_sf_1, mapping = aes(fill = dead), colour = map_country_line_colour) +
+    geom_sf(data = plot_sf_1, mapping = aes(fill = dead), colour = map_country_line_colour, size = map_inline_thickness) +
     geom_sf(data = italy_outline_sf, fill = NA, colour = map_country_line_colour, size = map_outline_thickness) +
     scale_fill_gradientn(breaks = my_breaks,
                          colors = my_cols,
@@ -51,10 +51,10 @@ g_1 <- ggplot() +
     theme(plot.background = map_plot_background)
 
 
-date_index_2 <- "01-05-2020"
+date_index_2 <- "01-06-2020"
 plot_sf_2 <- left_join(italy_sf, filter(epi_df, date == date_index_2), by = "NAME_1")
 g_2 <- ggplot() +
-    geom_sf(data = plot_sf_2, mapping = aes(fill = dead), colour = map_country_line_colour) +
+    geom_sf(data = plot_sf_2, mapping = aes(fill = dead), colour = map_country_line_colour, size = map_inline_thickness) +
     geom_sf(data = italy_outline_sf, fill = NA, colour = map_country_line_colour, size = map_outline_thickness) +
     scale_fill_gradientn(breaks = my_breaks,
                       colors = my_cols,
@@ -62,18 +62,6 @@ g_2 <- ggplot() +
     theme_nothing() +
     theme(plot.background = map_plot_background)
 
-
-date_index_3 <- "01-06-2020"
-plot_sf_3 <- left_join(italy_sf, filter(epi_df, date == date_index_3), by = "NAME_1")
-
-g_3 <- ggplot() +
-    geom_sf(data = plot_sf_3, mapping = aes(fill = dead), colour = map_country_line_colour) +
-    geom_sf(data = italy_outline_sf, fill = NA, colour = map_country_line_colour, size = map_outline_thickness) +
-    scale_fill_gradientn(breaks = my_breaks,
-                      colors = my_cols,
-                      limits = range(my_breaks)) +
-    theme_nothing() +
-    theme(plot.background = map_plot_background)
 
 italy_legend <- get_legend(g_1 +
                            labs(fill = "Cumulative\ndeaths") +
@@ -81,15 +69,14 @@ italy_legend <- get_legend(g_1 +
                                  legend.box.margin = margin(0, 0, 0, 0),
                                  legend.key.height = unit(2, units = "cm")))
 
-g_maps_without_legend <- plot_grid(g_1 + theme(legend.position = "none"),
-                                   g_2 + theme(legend.position = "none"),
-                                   g_3 + theme(legend.position = "none"),
+g_maps_without_legend <- plot_grid(g_1 + theme(legend.position = "none", plot.margin = margin(0, 0, 0, 0, "cm")),
+                                   g_2 + theme(legend.position = "none", plot.margin = margin(0, 0, 0, 0, "cm")),
                                    ncol = 1)
 
 g_maps <- plot_grid(g_maps_without_legend,
                     italy_legend,
                     ncol = 2,
-                    rel_widths = c(1,0.5))
+                    rel_widths = c(1,0.3))
 
 plot_epi_df <- epi_df %>%
     group_by(date) %>%
@@ -114,7 +101,7 @@ plot_ts_df <- left_join(plot_epi_df, plot_gov_df, by = "date") %>%
 g_epi <- ggplot() +
     geom_line(data = filter(plot_ts_df, variable == "total_dead"),
               mapping = aes(x = date, y = value)) +
-    geom_vline(xintercept = as.Date(c(date_index_1, date_index_2, date_index_3), format = "%d-%m-%Y"),
+    geom_vline(xintercept = as.Date(c(date_index_1, date_index_2), format = "%d-%m-%Y"),
                linetype = "dashed") +
     labs(x = "Date", y = "Cumulative deaths") +
     theme_classic()
