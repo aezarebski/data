@@ -134,4 +134,9 @@ g_final <- plot_grid(g_ts,
                      rel_widths = c(0.7,1.0),
                      labels = c("","D"))
 
+## If writing to PNG does not work you can save the figure as a PDF and then
+## convert it with the following command.
+##
+## $ convert -density 300 out/demo-combination-plot.pdf -quality 100 out/demo-combination-plot.png
+##
 ggsave("out/demo-combination-plot.pdf", g_final, width = 2 * 14.8, height = 2 * 10.5, units = "cm")
